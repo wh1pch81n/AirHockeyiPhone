@@ -24,9 +24,6 @@
 		7F5DCFC1173484C8003308ED /* button_hot@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F5DCFAB173484C8003308ED /* button_hot@2x.png */; };
 		7F5DCFC2173484C8003308ED /* button.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F5DCFAC173484C8003308ED /* button.png */; };
 		7F5DCFC3173484C8003308ED /* button@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F5DCFAD173484C8003308ED /* button@2x.png */; };
-		7F5DCFC4173484C8003308ED /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F5DCFAE173484C8003308ED /* Default-568h@2x.png */; };
-		7F5DCFC5173484C8003308ED /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F5DCFAF173484C8003308ED /* Default.png */; };
-		7F5DCFC6173484C8003308ED /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F5DCFB0173484C8003308ED /* Default@2x.png */; };
 		7F5DCFC7173484C8003308ED /* Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F5DCFB1173484C8003308ED /* Icon-72.png */; };
 		7F5DCFC8173484C8003308ED /* Icon-Small-50.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F5DCFB2173484C8003308ED /* Icon-Small-50.png */; };
 		7F5DCFC9173484C8003308ED /* Icon-Small.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F5DCFB3173484C8003308ED /* Icon-Small.png */; };
@@ -43,6 +40,7 @@
 		7F5DCFD917348521003308ED /* paddle.wav in Resources */ = {isa = PBXBuildFile; fileRef = 7F5DCFD617348521003308ED /* paddle.wav */; };
 		7F5DCFDA17348521003308ED /* score.wav in Resources */ = {isa = PBXBuildFile; fileRef = 7F5DCFD717348521003308ED /* score.wav */; };
 		7F5DCFDB17348521003308ED /* wall.wav in Resources */ = {isa = PBXBuildFile; fileRef = 7F5DCFD817348521003308ED /* wall.wav */; };
+		7F99F20A17348BC800D7B56A /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F99F20917348BC800D7B56A /* AudioToolbox.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -87,6 +85,7 @@
 		7F5DCFD617348521003308ED /* paddle.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = paddle.wav; sourceTree = "<group>"; };
 		7F5DCFD717348521003308ED /* score.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = score.wav; sourceTree = "<group>"; };
 		7F5DCFD817348521003308ED /* wall.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = wall.wav; sourceTree = "<group>"; };
+		7F99F20917348BC800D7B56A /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +93,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7F99F20A17348BC800D7B56A /* AudioToolbox.framework in Frameworks */,
 				7F37103917348206002C0816 /* UIKit.framework in Frameworks */,
 				7F37103B17348206002C0816 /* Foundation.framework in Frameworks */,
 				7F37103D17348206002C0816 /* CoreGraphics.framework in Frameworks */,
@@ -123,6 +123,7 @@
 		7F37103717348206002C0816 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7F99F20917348BC800D7B56A /* AudioToolbox.framework */,
 				7F37103817348206002C0816 /* UIKit.framework */,
 				7F37103A17348206002C0816 /* Foundation.framework */,
 				7F37103C17348206002C0816 /* CoreGraphics.framework */,
@@ -245,9 +246,6 @@
 				7F5DCFC1173484C8003308ED /* button_hot@2x.png in Resources */,
 				7F5DCFC2173484C8003308ED /* button.png in Resources */,
 				7F5DCFC3173484C8003308ED /* button@2x.png in Resources */,
-				7F5DCFC4173484C8003308ED /* Default-568h@2x.png in Resources */,
-				7F5DCFC5173484C8003308ED /* Default.png in Resources */,
-				7F5DCFC6173484C8003308ED /* Default@2x.png in Resources */,
 				7F5DCFC7173484C8003308ED /* Icon-72.png in Resources */,
 				7F5DCFC8173484C8003308ED /* Icon-Small-50.png in Resources */,
 				7F5DCFC9173484C8003308ED /* Icon-Small.png in Resources */,
@@ -364,7 +362,9 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AirHockeyTake2/AirHockeyTake2-Prefix.pch";
 				INFOPLIST_FILE = "AirHockeyTake2/AirHockeyTake2-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -375,7 +375,9 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AirHockeyTake2/AirHockeyTake2-Prefix.pch";
 				INFOPLIST_FILE = "AirHockeyTake2/AirHockeyTake2-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

@@ -10,7 +10,7 @@
 
 #import <AudioToolbox/AudioToolbox.h>
 #import <Foundation/Foundation.h>
-@interface PaddlesViewController : UIViewController{
+@interface AirHocky_ViewController : UIViewController{
 	UITouch *touch1_top;
 	UITouch *touch2_bot;
 	UIAlertView *alert;
@@ -29,8 +29,7 @@
 @property (strong, nonatomic) IBOutlet UILabel *Player_1_label;
 @property (strong, nonatomic) IBOutlet UILabel *Player_2_label;
 
-//@property (strong, nonatomic) IBOutlet UIView *viewPuck_0;//do not use.  I don't know how to get rid of this without crashing the program
-
 //public methods
 -(void) pause;
 -(void) resume;
+@end

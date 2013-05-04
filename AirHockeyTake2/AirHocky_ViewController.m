@@ -15,13 +15,13 @@
 #define SOUND_PADDLE 1
 #define SOUND_SCORE 2
 
-@interface PaddlesViewController ()
+@interface AirHocky_ViewController ()
 @end
 
-@implementation PaddlesViewController
+@implementation AirHocky_ViewController
 @synthesize viewPaddle1_top;
 @synthesize viewPaddle2_bot;
-//@synthesize viewPuck_0;//do not use
+
 @synthesize viewPuck;
 @synthesize viewScore1_top;
 @synthesize viewScore2_bot;
@@ -59,7 +59,7 @@
 - (void)viewDidUnload {
     [self setViewPaddle1_top:nil];
     [self setViewPaddle2_bot:nil];
-  //  [self setViewPuck_0:nil];//unused.  can't comment out for some reason
+  
 	[self setViewPuck:nil];
 	[self setViewScore1_top:nil];
 	[self setViewScore2_bot:nil];
@@ -146,14 +146,17 @@
 	//reset speed of puck
 	speed = 2;
 	
-	//reset size of paddles
-	CGRect newFrame1 = viewPaddle1_top.frame;
-	newFrame1.size.width = 64;
-	viewPaddle1_top.frame = newFrame1;
+	//make puck huge.  only for debug
+	[viewPuck setTransform:CGAffineTransformMakeScale(5, 5)];
 	
-	CGRect newFrame2 = viewPaddle2_bot.frame;
-	newFrame2.size.width = 64;
-	viewPaddle2_bot.frame = newFrame2;
+//	//reset size of paddles
+//	CGRect newFrame1 = viewPaddle1_top.frame;
+//	newFrame1.size.width = 64;
+//	viewPaddle1_top.frame = newFrame1;
+//	
+//	CGRect newFrame2 = viewPaddle2_bot.frame;
+//	newFrame2.size.width = 64;
+//	viewPaddle2_bot.frame = newFrame2;
 	//reset collisions
 	numPaddleCollisions = 0;
 }
@@ -209,7 +212,16 @@
 	//reset score
 	viewScore1_top.text = [NSString stringWithFormat: @"%@", @"0"];
 	viewScore2_bot.text = [NSString stringWithFormat: @"%@", @"0"];
+	//reset puck size
+	//reset size of paddles
+	CGRect newFrame1 = viewPaddle1_top.frame;
+	newFrame1.size.width = viewPaddle1_top.frame.size.width;//64;
+	viewPaddle1_top.frame = newFrame1;
 	
+	CGRect newFrame2 = viewPaddle2_bot.frame;
+	newFrame2.size.width = viewPaddle2_bot.frame.size.width;//64;
+	viewPaddle2_bot.frame = newFrame2;
+
 	[Player_1_label setTransform:CGAffineTransformMakeRotation(M_PI/2)];//rotate the label
 	[Player_2_label setTransform:CGAffineTransformMakeRotation(M_PI/2)];
 	
@@ -247,8 +259,8 @@ didDismissWithButtonIndex:(NSInteger)buttonIndex
 			dy = y;
 			//count the number of puck collisions with the puck.
 			//every ten will cause the paddles of both player to shrink.
-			if ((numPaddleCollisions++ % 10)==9) {
-				[self shrinkPaddleWidth];
+			if ((numPaddleCollisions++ % 10)==9) {				
+				[self shrinkPaddle];
 			}
 		}
 		
@@ -297,18 +309,22 @@ didDismissWithButtonIndex:(NSInteger)buttonIndex
 	speed += 0.5;
 	if(speed > 10) speed = 10;
 }
--(void)shrinkPaddleWidth{
+-(void)shrinkPaddle{
 	//NSLog(@"Shink Paddles!");
 	//NSLog(@"%f\n",viewPaddle1_top.frame.size.width);
+	//printf("[x,y], [%f, %f]", viewPaddle1_top.center.x, viewPaddle1_top.center.y);
 	speed = 2;
 	if (viewPaddle1_top.frame.size.width >30) {//set the limit on shrinking
+		
 		//shrink both paddles
 		CGRect newFrame1 = viewPaddle1_top.frame;
 		newFrame1.size.width -=10;
+		newFrame1.size.height -=10;
 		viewPaddle1_top.frame = newFrame1;
 		
 		CGRect newFrame2 = viewPaddle2_bot.frame;
 		newFrame2.size.width -=10;
+		newFrame2.size.height -=10;
 		viewPaddle2_bot.frame = newFrame2;
 		
 	}
@@ -325,32 +341,24 @@ didDismissWithButtonIndex:(NSInteger)buttonIndex
 	//Quick and dirty AI for top paddle
 	//viewPaddle1_top.center = CGPointMake(viewPuck.center.x, viewPaddle1_top.center.y);
 	//check puck collision with left and right walls
-	if([self checkPuckCollision:CGRectMake(-10, 0, 20, 480)
-						   DirX:fabs(dx)
-						   DirY:0])
+	
+	if([self checkPuckCollision:CGRectMake(-10, 0, 20, 480) DirX:fabs(dx) DirY:0] ||
+	   [self checkPuckCollision:CGRectMake(310, 0, 20, 480) DirX:-fabs(dx) DirY:0])
 		{
 		[self playSound:SOUND_WALL];
 		}
-	if([self checkPuckCollision:CGRectMake(310, 0, 20, 480)
-						   DirX:-fabs(dx)
-						   DirY:0])
-		{
-		[self playSound:SOUND_WALL];
-		}
+	//check that the puck hit the non goalie wall
+	
 	//check puck collision with player paddles
 	if([self checkPuckCollision:viewPaddle1_top.frame
 						   DirX:((viewPuck.center.x -viewPaddle1_top.center.x)/13.0)*((arc4random() %2)?-1:1)
-						   DirY:1])
-		{
-		[self playSound:SOUND_PADDLE];
-		[self increaseSpeed];
-		}
-	if([self checkPuckCollision:viewPaddle2_bot.frame
+						   DirY:1] ||
+	   [self checkPuckCollision:viewPaddle2_bot.frame
 						   DirX:((viewPuck.center.x -viewPaddle2_bot.center.x)/13.0)*((arc4random() %2)?-1:1)
 						   DirY:-1])
 		{
 		[self playSound:SOUND_PADDLE];
-		[self increaseSpeed];
+		//[self increaseSpeed];
 		}
 	//check for goal
 	if( 	[self checkGoal])

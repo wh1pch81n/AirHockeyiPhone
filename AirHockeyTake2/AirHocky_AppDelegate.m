@@ -10,17 +10,13 @@
 
 #import "AirHocky_ViewController.h"
 
-@implementation PaddlesAppDelegate
+@implementation AirHocky_AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    // Override point for customization after application launch.
-	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-	    self.viewController = [[PaddlesViewController alloc] initWithNibName:@"PaddlesViewController_iPhone" bundle:nil];
-	} else {
-	    self.viewController = [[PaddlesViewController alloc] initWithNibName:@"PaddlesViewController_iPad" bundle:nil];
-	}
+	self.viewController = [[AirHocky_ViewController alloc] initWithNibName:@"AirHocky_ViewController" bundle:nil];
+	
 	self.window.rootViewController = self.viewController;
     [self.window makeKeyAndVisible];
     return YES;

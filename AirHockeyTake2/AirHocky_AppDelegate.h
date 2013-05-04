@@ -8,12 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
-@class PaddlesViewController;
+@class AirHocky_ViewController;
 
-@interface PaddlesAppDelegate : UIResponder <UIApplicationDelegate>
+@interface AirHocky_AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 
-@property (strong, nonatomic) PaddlesViewController *viewController;
+@property (strong, nonatomic) AirHocky_ViewController *viewController;
 
 @end
