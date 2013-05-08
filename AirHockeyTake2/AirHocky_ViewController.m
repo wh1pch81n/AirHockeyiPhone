@@ -8,12 +8,22 @@
 
 #import "AirHocky_ViewController.h"
 
+#define DEBUG_RED_BOUNDRY YES
 #define MAX_SCORE 3
 #define PLAYER1_TOP_WON 1
 #define PLAYER2_BOT_WON 2
 #define SOUND_WALL 0
 #define SOUND_PADDLE 1
 #define SOUND_SCORE 2
+
+#define TopPlayerOffset 20; // need offset for top player. not sure why. might be the status bar is offsetting something
+
+#define MAX_SPEED 15
+struct CGRect gPlayerBox[] ={
+	// x,   y          width,    height
+	{  40,  40,       320-80, 240-40-32}, //player 1 box
+	{  40,  240+33, 320-80, 240-40-32}//player 2 box
+};
 
 @interface AirHocky_ViewController ()
 @end
@@ -27,6 +37,18 @@
 @synthesize viewScore2_bot;
 @synthesize Player_1_label;
 @synthesize Player_2_label;
+//barriers
+@synthesize WallBarrierLeft;
+@synthesize WallBarrierRight;
+@synthesize WallGoalBarrierTopLeft;
+@synthesize WallGoalBarrierTopRight;
+@synthesize WallInnerGoalBarrierTopLeft;
+@synthesize WallInnerGoalBarrierTopRight;
+@synthesize WallGoalBarrierBottomLeft;
+@synthesize WallGoalBarrierBottomRight;
+@synthesize WallInnerGoalBarrierBottomLeft;
+@synthesize WallInnerGoalBarrierBottomRight;
+
 
 -(void) pause{
 	[self stop];
@@ -47,6 +69,22 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
 	[self initSounds];
+	//debug stuffs
+	if (DEBUG_RED_BOUNDRY) {
+		for (int i = 0; i < 2; ++i) {
+			UIView * view = [[UIView alloc]initWithFrame:gPlayerBox[i]];
+			view.backgroundColor = [UIColor redColor];
+			view.alpha = 0.25;
+			[self.view addSubview:view];
+			
+		}
+	}
+	
+	//create the paddle helpers
+	paddle1_top = [[Paddle alloc] initWithView:viewPaddle1_top
+									   Boundry:gPlayerBox[0] MaxSpeed:MAX_SPEED];
+	paddle2_bot = [[Paddle alloc] initWithView:viewPaddle2_bot
+									   Boundry:gPlayerBox[1] MaxSpeed:MAX_SPEED];
 	[self newGame];
 }
 
@@ -65,6 +103,16 @@
 	[self setViewScore2_bot:nil];
 	[self setPlayer_1_label:nil];
 	[self setPlayer_2_label:nil];
+	[self setWallBarrierLeft:nil];
+	[self setWallBarrierRight:nil];
+	[self setWallGoalBarrierTopLeft:nil];
+	[self setWallGoalBarrierTopRight:nil];
+	[self setWallInnerGoalBarrierTopLeft:nil];
+	[self setWallInnerGoalBarrierTopRight:nil];
+	[self setWallGoalBarrierBottomLeft:nil];
+	[self setWallGoalBarrierBottomRight:nil];
+	[self setWallInnerGoalBarrierBottomLeft:nil];
+	[self setWallInnerGoalBarrierBottomRight:nil];
     [super viewDidUnload];
 }
 
@@ -80,14 +128,27 @@
 		//get the point of touch within the view
 		CGPoint touchPoint = [touch locationInView:self.view];
 		
-		//move the paddle based on which half of the screen the touch falls into
-		if (!touch1_top && 0< touchPoint.y && touchPoint.y < 100) {
-			touch1_top = touch;
-			viewPaddle1_top.center = CGPointMake(touchPoint.x, viewPaddle1_top.center.y);
-		}else if (!touch2_bot && 379 < touchPoint.y && touchPoint.y < 479){
-			touch2_bot = touch;
-			viewPaddle2_bot.center = CGPointMake(touchPoint.x, viewPaddle2_bot.center.y);
+		// if paddle not already assigned a specific  touch then
+		// determine which half of the screen the touch is on
+		// and assign it to that specific paddle
+		if( paddle1_top.touch == nil & touchPoint.y < 240){
+			touchPoint.y += 32 + TopPlayerOffset;
+			paddle1_top.touch = touch;
+			[paddle1_top move:touchPoint];
+		}else if (paddle2_bot.touch == nil && touchPoint.y >= 240){
+			touchPoint.y -= 32;
+			paddle2_bot.touch = touch;
+			[paddle2_bot move:touchPoint];
 		}
+		
+//		//move the paddle based on which half of the screen the touch falls into
+//		if (!touch1_top && 0< touchPoint.y && touchPoint.y < 100) {
+//			touch1_top = touch;
+//			viewPaddle1_top.center = CGPointMake(touchPoint.x, viewPaddle1_top.center.y);
+//		}else if (!touch2_bot && 379 < touchPoint.y && touchPoint.y < 479){
+//			touch2_bot = touch;
+//			viewPaddle2_bot.center = CGPointMake(touchPoint.x, viewPaddle2_bot.center.y);
+//		}
 	}
 }
 //multi touch functions
@@ -100,14 +161,26 @@
 	for (UITouch *touch in touches) {
 		//get the point of touch within the view
 		CGPoint touchPoint = [touch locationInView:self.view];
-		//if the touch is assigned to our paddle then move it
-		if(touch == touch1_top){
-			viewPaddle1_top.center = CGPointMake(touchPoint.x, viewPaddle1_top.center.y);
-		}else if(touch == touch2_bot){
-			viewPaddle2_bot.center = CGPointMake(touchPoint.x, viewPaddle2_bot.center.y);
-		}else{
-			
+		
+		// if paddle not already assigned a specific touch then
+		// determine which half of the screen the touch is on
+		// and assign it to that specific paddle
+		if(paddle1_top.touch == touch){
+			touchPoint.y += 32 + TopPlayerOffset;
+			[paddle1_top move:touchPoint];
+		}else if(paddle2_bot.touch == touch){
+			touchPoint.y -= 32;
+			[paddle2_bot move:touchPoint];
 		}
+		
+//		//if the touch is assigned to our paddle then move it
+//		if(touch == touch1_top){
+//			viewPaddle1_top.center = CGPointMake(touchPoint.x, viewPaddle1_top.center.y);
+//		}else if(touch == touch2_bot){
+//			viewPaddle2_bot.center = CGPointMake(touchPoint.x, viewPaddle2_bot.center.y);
+//		}else{
+//			
+//		}
 	}
 }
 //multi touch functions
@@ -116,9 +189,13 @@
 	//	for(UITouch *touch in touches){
 	//		NSLog(@" - %p", touch);
 	//	}
-	for (UITouch *touch in touches) {
-		if(touch == touch1_top ) touch1_top = nil;
-		else if(touch == touch2_bot) touch2_bot = nil;
+//	for (UITouch *touch in touches) {
+//		if(touch == touch1_top ) touch1_top = nil;
+//		else if(touch == touch2_bot) touch2_bot = nil;
+//	}
+	for( UITouch * touch in touches){
+		if( paddle1_top.touch == touch ) {paddle1_top.touch = nil;}
+		else if( paddle2_bot.touch == touch) {paddle2_bot.touch = nil;}
 	}
 }
 //multi touch functions
@@ -133,6 +210,10 @@
 	[self touchesEnded:touches withEvent:event];
 }
 -(void)reset{
+	//reset paddles to their default position
+	[paddle1_top reset];
+	[paddle2_bot reset];
+	
 	//set direction of ball to either left or right direction
 	dx = ((arc4random()%2) == 0)? -1: 1;
 	
@@ -147,7 +228,7 @@
 	speed = 2;
 	
 	//make puck huge.  only for debug
-	[viewPuck setTransform:CGAffineTransformMakeScale(5, 5)];
+	//[viewPuck setTransform:CGAffineTransformMakeScale(5, 5)];
 	
 //	//reset size of paddles
 //	CGRect newFrame1 = viewPaddle1_top.frame;
@@ -215,11 +296,13 @@
 	//reset puck size
 	//reset size of paddles
 	CGRect newFrame1 = viewPaddle1_top.frame;
-	newFrame1.size.width = viewPaddle1_top.frame.size.width;//64;
+	newFrame1.size.width = 64;
+	newFrame1.size.height = 64;
 	viewPaddle1_top.frame = newFrame1;
 	
 	CGRect newFrame2 = viewPaddle2_bot.frame;
-	newFrame2.size.width = viewPaddle2_bot.frame.size.width;//64;
+	newFrame2.size.width = 64;
+	newFrame2.size.height = 64;
 	viewPaddle2_bot.frame = newFrame2;
 
 	[Player_1_label setTransform:CGAffineTransformMakeRotation(M_PI/2)];//rotate the label
@@ -255,14 +338,7 @@ didDismissWithButtonIndex:(NSInteger)buttonIndex
 		{
 		//change the direction of the ball
 		if(x != 0.0) {dx = x;}
-		if(y != 0.0){
-			dy = y;
-			//count the number of puck collisions with the puck.
-			//every ten will cause the paddles of both player to shrink.
-			if ((numPaddleCollisions++ % 10)==9) {				
-				[self shrinkPaddle];
-			}
-		}
+		if(y != 0.0){dy = y;}
 		
 		return TRUE;
 		}
@@ -270,7 +346,8 @@ didDismissWithButtonIndex:(NSInteger)buttonIndex
 }
 -(BOOL)checkGoal{
 	//check of ball is out of bounds and reset game if so
-	if(viewPuck.center.y <0 || viewPuck.center.y >= 480){
+	if((viewPuck.center.y + viewPuck.frame.size.height  )<0 ||
+	   (viewPuck.center.y -viewPuck.frame.size.height) >= 480){
 		//get integer value from score label
 		int s1 = [viewScore1_top.text intValue];
 		int s2 = [viewScore2_bot.text intValue];
@@ -342,29 +419,51 @@ didDismissWithButtonIndex:(NSInteger)buttonIndex
 	//viewPaddle1_top.center = CGPointMake(viewPuck.center.x, viewPaddle1_top.center.y);
 	//check puck collision with left and right walls
 	
-	if([self checkPuckCollision:CGRectMake(-10, 0, 20, 480) DirX:fabs(dx) DirY:0] ||
-	   [self checkPuckCollision:CGRectMake(310, 0, 20, 480) DirX:-fabs(dx) DirY:0])
-		{
+	if([self checkPuckCollision:WallBarrierLeft.frame DirX:fabs(dx) DirY:0] ||
+	   [self checkPuckCollision:WallBarrierRight.frame DirX:-fabs(dx) DirY:0] ||
+		
+	   [self checkPuckCollision:WallGoalBarrierTopLeft.frame DirX:0 DirY:fabs(dy)] ||
+	   [self checkPuckCollision:WallGoalBarrierTopRight.frame DirX:0 DirY:fabs(dy)] ||
+	   
+	   [self checkPuckCollision:WallInnerGoalBarrierTopLeft.frame DirX:fabs(dx) DirY:0] ||
+	   [self checkPuckCollision:WallInnerGoalBarrierTopRight.frame DirX:-fabs(dx) DirY:0] ||
+	   
+	   [self checkPuckCollision:WallGoalBarrierBottomLeft.frame DirX:0 DirY:-fabs(dy)] ||
+	   [self checkPuckCollision:WallGoalBarrierBottomRight.frame DirX:0 DirY:-fabs(dy)] ||
+	   
+	   [self checkPuckCollision:WallInnerGoalBarrierBottomLeft.frame DirX:fabs(dx) DirY:0] ||
+	   [self checkPuckCollision:WallInnerGoalBarrierBottomRight.frame DirX:-fabs(dx) DirY:0]
+	   )	{
 		[self playSound:SOUND_WALL];
-		}
+	}
 	//check that the puck hit the non goalie wall
 	
-	//check puck collision with player paddles
-	if([self checkPuckCollision:viewPaddle1_top.frame
-						   DirX:((viewPuck.center.x -viewPaddle1_top.center.x)/13.0)*((arc4random() %2)?-1:1)
-						   DirY:1] ||
-	   [self checkPuckCollision:viewPaddle2_bot.frame
-						   DirX:((viewPuck.center.x -viewPaddle2_bot.center.x)/13.0)*((arc4random() %2)?-1:1)
-						   DirY:-1])
-		{
-		[self playSound:SOUND_PADDLE];
-		//[self increaseSpeed];
-		}
-	//check for goal
-	if( 	[self checkGoal])
-		{
-		[self playSound:SOUND_SCORE];
-		}
+//	//check puck collision with player paddles
+//	if([self checkPuckCollision:viewPaddle1_top.frame
+//						   DirX:((viewPuck.center.x -viewPaddle1_top.center.x)/13.0)*((arc4random() %2)?-1:1)
+//						   DirY:1] ||
+//	   [self checkPuckCollision:viewPaddle2_bot.frame
+//						   DirX:((viewPuck.center.x -viewPaddle2_bot.center.x)/13.0)*((arc4random() %2)?-1:1)
+//						   DirY:-1])
+//		{
+//		[self playSound:SOUND_PADDLE];
+//		//count the number of puck collisions with the puck.
+//		//every ten will cause the paddles of both player to shrink.
+////		if ((numPaddleCollisions++ % 10)==9) {
+////			[self shrinkPaddle];
+////		}
+//		//[self increaseSpeed];
+//		}
+//	//check for goal
+//	if( 	[self checkGoal])
+//		{
+//		[self playSound:SOUND_SCORE];
+//		}
+	
+	//move paddles
+	[paddle1_top animate];
+	[paddle2_bot animate];
+	
 }
 -(BOOL) canBecomeFirstResponder{
 	return YES;
