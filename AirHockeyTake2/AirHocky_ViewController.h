@@ -11,6 +11,8 @@
 #import <AudioToolbox/AudioToolbox.h>
 #import <Foundation/Foundation.h>
 #import "Paddle.h"
+#import "Puck.h"
+
 @interface AirHocky_ViewController : UIViewController{
 	//UITouch *touch1_top;
 	//UITouch *touch2_bot;
@@ -21,6 +23,7 @@
 	SystemSoundID sounds[3];
 	Paddle * paddle1_top;
 	Paddle * paddle2_bot;
+	Puck * puck;
 }
 @property (strong, nonatomic) IBOutlet UIView *viewPaddle1_top;
 @property (strong, nonatomic) IBOutlet UIView *viewPaddle2_bot;

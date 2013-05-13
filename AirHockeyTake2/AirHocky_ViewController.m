@@ -8,7 +8,8 @@
 
 #import "AirHocky_ViewController.h"
 
-#define DEBUG_RED_BOUNDRY YES
+
+#define DEBUG_RED_BOUNDRY NO
 #define MAX_SCORE 3
 #define PLAYER1_TOP_WON 1
 #define PLAYER2_BOT_WON 2
@@ -24,6 +25,18 @@ struct CGRect gPlayerBox[] ={
 	{  40,  40,       320-80, 240-40-32}, //player 1 box
 	{  40,  240+33, 320-80, 240-40-32}//player 2 box
 };
+//puck is contained by this rect
+struct CGRect gPuckBox = {
+	//x,  y    width,    height
+	  28, 28, 320-56, 480-56
+};
+//goal boxes that puck can enter
+struct CGRect gGoalBox[]=
+{
+	{ 102, -20, 116, 49}, //player 1 win box
+	{ 102, 451, 116, 49}
+};
+
 
 @interface AirHocky_ViewController ()
 @end
@@ -76,8 +89,18 @@ struct CGRect gPlayerBox[] ={
 			view.backgroundColor = [UIColor redColor];
 			view.alpha = 0.25;
 			[self.view addSubview:view];
-			
 		}
+		for (int i = 0; i < 2; ++i){
+			UIView * view = [[UIView alloc] initWithFrame:gGoalBox[i]];
+			view.backgroundColor = [UIColor greenColor];
+			view.alpha = 0.25;
+			[self.view addSubview:view];
+		}
+		//debug code to show puck box
+		UIView * view = [[UIView alloc] initWithFrame:gPuckBox];
+		view.backgroundColor = [ UIColor grayColor];
+		view.alpha = 0.25;
+		[self.view addSubview:view];
 	}
 	
 	//create the paddle helpers
@@ -85,6 +108,13 @@ struct CGRect gPlayerBox[] ={
 									   Boundry:gPlayerBox[0] MaxSpeed:MAX_SPEED];
 	paddle2_bot = [[Paddle alloc] initWithView:viewPaddle2_bot
 									   Boundry:gPlayerBox[1] MaxSpeed:MAX_SPEED];
+	//create the puck
+	puck = [[Puck alloc] initWithPuck:viewPuck
+							 Boundary:gPuckBox
+								Goal1:gGoalBox[0]
+								Goal2:gGoalBox[1]
+							 MaxSpeed:MAX_SPEED];
+	
 	[self newGame];
 }
 
@@ -213,16 +243,16 @@ struct CGRect gPlayerBox[] ={
 	//reset paddles to their default position
 	[paddle1_top reset];
 	[paddle2_bot reset];
-	
+	[puck reset];
 	//set direction of ball to either left or right direction
-	dx = ((arc4random()%2) == 0)? -1: 1;
+	//dx = ((arc4random()%2) == 0)? -1: 1;
 	
 	//reverse dy if not 0 as this will send the puck to the
 	//player who just scored otherwise set in random direction
-	dy = (dy != 0)? -dy:((arc4random() %2) == 0)? -1 : 1;
+	//dy = (dy != 0)? -dy:((arc4random() %2) == 0)? -1 : 1;
 	
 	//move point to random position in center
-	viewPuck.center = CGPointMake(15 + arc4random() % (320-30), 240);
+	//viewPuck.center = CGPointMake(15 + arc4random() % (320-30), 240);
 	
 	//reset speed of puck
 	speed = 2;
@@ -346,14 +376,13 @@ didDismissWithButtonIndex:(NSInteger)buttonIndex
 }
 -(BOOL)checkGoal{
 	//check of ball is out of bounds and reset game if so
-	if((viewPuck.center.y + viewPuck.frame.size.height  )<0 ||
-	   (viewPuck.center.y -viewPuck.frame.size.height) >= 480){
+	if( puck.winner != 0){
 		//get integer value from score label
 		int s1 = [viewScore1_top.text intValue];
 		int s2 = [viewScore2_bot.text intValue];
 		
 		//give a point to correct player
-		if (viewPuck.center.y <0) {
+		if (puck.winner == 2) {
 			++s2;
 		}else{
 			++s1;
@@ -413,29 +442,28 @@ didDismissWithButtonIndex:(NSInteger)buttonIndex
 -(void)animate{
 	
 	//move puch to new position based on direction and speed
-	viewPuck.center = CGPointMake(viewPuck.center.x + (dx*speed),
-								  viewPuck.center.y + (dy*speed));
+//	viewPuck.center = CGPointMake(viewPuck.center.x + (dx*speed), viewPuck.center.y + (dy*speed));
 	//Quick and dirty AI for top paddle
 	//viewPaddle1_top.center = CGPointMake(viewPuck.center.x, viewPaddle1_top.center.y);
 	//check puck collision with left and right walls
 	
-	if([self checkPuckCollision:WallBarrierLeft.frame DirX:fabs(dx) DirY:0] ||
-	   [self checkPuckCollision:WallBarrierRight.frame DirX:-fabs(dx) DirY:0] ||
-		
-	   [self checkPuckCollision:WallGoalBarrierTopLeft.frame DirX:0 DirY:fabs(dy)] ||
-	   [self checkPuckCollision:WallGoalBarrierTopRight.frame DirX:0 DirY:fabs(dy)] ||
-	   
-	   [self checkPuckCollision:WallInnerGoalBarrierTopLeft.frame DirX:fabs(dx) DirY:0] ||
-	   [self checkPuckCollision:WallInnerGoalBarrierTopRight.frame DirX:-fabs(dx) DirY:0] ||
-	   
-	   [self checkPuckCollision:WallGoalBarrierBottomLeft.frame DirX:0 DirY:-fabs(dy)] ||
-	   [self checkPuckCollision:WallGoalBarrierBottomRight.frame DirX:0 DirY:-fabs(dy)] ||
-	   
-	   [self checkPuckCollision:WallInnerGoalBarrierBottomLeft.frame DirX:fabs(dx) DirY:0] ||
-	   [self checkPuckCollision:WallInnerGoalBarrierBottomRight.frame DirX:-fabs(dx) DirY:0]
-	   )	{
-		[self playSound:SOUND_WALL];
-	}
+//	if([self checkPuckCollision:WallBarrierLeft.frame DirX:fabs(dx) DirY:0] ||
+//	   [self checkPuckCollision:WallBarrierRight.frame DirX:-fabs(dx) DirY:0] ||
+//		
+//	   [self checkPuckCollision:WallGoalBarrierTopLeft.frame DirX:0 DirY:fabs(dy)] ||
+//	   [self checkPuckCollision:WallGoalBarrierTopRight.frame DirX:0 DirY:fabs(dy)] ||
+//	   
+//	   [self checkPuckCollision:WallInnerGoalBarrierTopLeft.frame DirX:fabs(dx) DirY:0] ||
+//	   [self checkPuckCollision:WallInnerGoalBarrierTopRight.frame DirX:-fabs(dx) DirY:0] ||
+//	   
+//	   [self checkPuckCollision:WallGoalBarrierBottomLeft.frame DirX:0 DirY:-fabs(dy)] ||
+//	   [self checkPuckCollision:WallGoalBarrierBottomRight.frame DirX:0 DirY:-fabs(dy)] ||
+//	   
+//	   [self checkPuckCollision:WallInnerGoalBarrierBottomLeft.frame DirX:fabs(dx) DirY:0] ||
+//	   [self checkPuckCollision:WallInnerGoalBarrierBottomRight.frame DirX:-fabs(dx) DirY:0]
+//	   )	{
+//		[self playSound:SOUND_WALL];
+//	}
 	//check that the puck hit the non goalie wall
 	
 //	//check puck collision with player paddles
@@ -463,6 +491,20 @@ didDismissWithButtonIndex:(NSInteger)buttonIndex
 	//move paddles
 	[paddle1_top animate];
 	[paddle2_bot animate];
+	
+	//handle paddle collisions which return true if a collision occured
+	if( [puck handleCollision:paddle1_top] ||
+	   [puck handleCollision:paddle2_bot]){
+		//play paddle hit
+		[self playSound:SOUND_PADDLE];
+	}
+	//animate our puck which returns true if a wall was hit
+	if( [puck animate]){
+		[self playSound:SOUND_WALL];
+	}
+	if( [self checkGoal]){
+		[self playSound:SOUND_SCORE];
+	}
 	
 }
 -(BOOL) canBecomeFirstResponder{
