@@ -13,6 +13,7 @@
 #import "Paddle.h"
 #import "Puck.h"
 
+enum { AI_WAIT, AI_BORED, AI_DEFENSE, AI_OFFENSE};
 @interface AirHocky_ViewController : UIViewController{
 	//UITouch *touch1_top;
 	//UITouch *touch2_bot;
@@ -24,7 +25,9 @@
 	Paddle * paddle1_top;
 	Paddle * paddle2_bot;
 	Puck * puck;
+	int ai_state;
 }
+@property(assign) int computer;
 @property (strong, nonatomic) IBOutlet UIView *viewPaddle1_top;
 @property (strong, nonatomic) IBOutlet UIView *viewPaddle2_bot;
 @property (strong, nonatomic) IBOutlet UIView *viewPuck;

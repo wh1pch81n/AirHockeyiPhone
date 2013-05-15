@@ -42,6 +42,8 @@
 		7F5DCFDB17348521003308ED /* wall.wav in Resources */ = {isa = PBXBuildFile; fileRef = 7F5DCFD817348521003308ED /* wall.wav */; };
 		7F6B33591739DA9700C473F8 /* Paddle.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F6B33581739DA9700C473F8 /* Paddle.m */; };
 		7F82A77A173AE81B00B7DDA6 /* Puck.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F82A779173AE81B00B7DDA6 /* Puck.m */; };
+		7F9526131741A4C40047C9C0 /* Title_ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7F9526111741A4C40047C9C0 /* Title_ViewController.m */; };
+		7F9526141741A4C40047C9C0 /* Title_ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7F9526121741A4C40047C9C0 /* Title_ViewController.xib */; };
 		7F99F20A17348BC800D7B56A /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F99F20917348BC800D7B56A /* AudioToolbox.framework */; };
 /* End PBXBuildFile section */
 
@@ -91,6 +93,9 @@
 		7F6B33581739DA9700C473F8 /* Paddle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Paddle.m; sourceTree = "<group>"; };
 		7F82A778173AE81B00B7DDA6 /* Puck.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Puck.h; sourceTree = "<group>"; };
 		7F82A779173AE81B00B7DDA6 /* Puck.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Puck.m; sourceTree = "<group>"; };
+		7F9526101741A4C40047C9C0 /* Title_ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Title_ViewController.h; sourceTree = "<group>"; };
+		7F9526111741A4C40047C9C0 /* Title_ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Title_ViewController.m; sourceTree = "<group>"; };
+		7F9526121741A4C40047C9C0 /* Title_ViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Title_ViewController.xib; sourceTree = "<group>"; };
 		7F99F20917348BC800D7B56A /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -148,6 +153,9 @@
 				7F6B33581739DA9700C473F8 /* Paddle.m */,
 				7F82A778173AE81B00B7DDA6 /* Puck.h */,
 				7F82A779173AE81B00B7DDA6 /* Puck.m */,
+				7F9526101741A4C40047C9C0 /* Title_ViewController.h */,
+				7F9526111741A4C40047C9C0 /* Title_ViewController.m */,
+				7F9526121741A4C40047C9C0 /* Title_ViewController.xib */,
 				7F37105317348206002C0816 /* AirHocky_ViewController.xib */,
 				7F37103F17348206002C0816 /* Supporting Files */,
 			);
@@ -272,6 +280,7 @@
 				7F5DCFD917348521003308ED /* paddle.wav in Resources */,
 				7F5DCFDA17348521003308ED /* score.wav in Resources */,
 				7F5DCFDB17348521003308ED /* wall.wav in Resources */,
+				7F9526141741A4C40047C9C0 /* Title_ViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -287,6 +296,7 @@
 				7F37105217348206002C0816 /* AirHocky_ViewController.m in Sources */,
 				7F6B33591739DA9700C473F8 /* Paddle.m in Sources */,
 				7F82A77A173AE81B00B7DDA6 /* Puck.m in Sources */,
+				7F9526131741A4C40047C9C0 /* Title_ViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

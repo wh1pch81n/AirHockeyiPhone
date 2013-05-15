@@ -9,13 +9,19 @@
 #import "AirHocky_AppDelegate.h"
 
 #import "AirHocky_ViewController.h"
+#import "Title_ViewController.h"
+
 
 @implementation AirHocky_AppDelegate
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+- (BOOL)application:(UIApplication *)application
+didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-	self.viewController = [[AirHocky_ViewController alloc] initWithNibName:@"AirHocky_ViewController" bundle:nil];
+    self.window = [[UIWindow alloc]
+				   initWithFrame:[[UIScreen mainScreen] bounds]];
+	self.viewController = [[Title_ViewController alloc]
+						   initWithNibName:@"Title_ViewController"
+						   bundle:nil];
 	
 	self.window.rootViewController = self.viewController;
     [self.window makeKeyAndVisible];
@@ -32,7 +38,9 @@
 	// Use this method to pause ongoing tasks, disable timers, and
 	//throttle down OpenGL ES frame rates. Games should use this
 	//method to pause the game.
-	[self.viewController pause];
+	if( self.gameController){
+	[self.gameController pause];
+	}
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
@@ -49,12 +57,34 @@
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
 	// Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-	[self.viewController resume];//resume app where it left off
+	if(self.gameController){
+		[self.gameController resume];//resume app where it left off
+	}
 }
-
 - (void)applicationWillTerminate:(UIApplication *)application
 {
 	// Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+}
+
+-(void) showTitle{
+	//dismiss the game controller
+	if( self.gameController){
+		[self.viewController dismissModalViewControllerAnimated:NO];
+		[self setGameController:nil];
+	}
+}
+/*will allocate a new AirHockey_viewController object*/
+-(void) playGame: (int) computer{
+	//present the game over the title
+	if( [self gameController] == nil){
+		[self setGameController: [[AirHocky_ViewController alloc]
+							  initWithNibName:@"AirHocky_ViewController"
+							  bundle:nil]];
+		[[self gameController] setComputer:computer];
+		[[self viewController] presentModalViewController:
+											   self.gameController
+											   animated:NO];
+	}
 }
 
 @end

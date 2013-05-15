@@ -7,7 +7,7 @@
 //
 
 #import "AirHocky_ViewController.h"
-
+#import "AirHocky_AppDelegate.h"
 
 #define DEBUG_RED_BOUNDRY NO
 #define MAX_SCORE 3
@@ -42,6 +42,7 @@ struct CGRect gGoalBox[]=
 @end
 
 @implementation AirHocky_ViewController
+@synthesize computer;
 @synthesize viewPaddle1_top;
 @synthesize viewPaddle2_bot;
 
@@ -161,7 +162,8 @@ struct CGRect gGoalBox[]=
 		// if paddle not already assigned a specific  touch then
 		// determine which half of the screen the touch is on
 		// and assign it to that specific paddle
-		if( paddle1_top.touch == nil & touchPoint.y < 240){
+		if( paddle1_top.touch == nil && touchPoint.y < 240 &&
+		   computer == 0){
 			touchPoint.y += 32 + TopPlayerOffset;
 			paddle1_top.touch = touch;
 			[paddle1_top move:touchPoint];
@@ -240,6 +242,9 @@ struct CGRect gGoalBox[]=
 	[self touchesEnded:touches withEvent:event];
 }
 -(void)reset{
+	//default ai_state
+	ai_state = 0;
+	
 	//reset paddles to their default position
 	[paddle1_top reset];
 	[paddle2_bot reset];
@@ -350,7 +355,8 @@ didDismissWithButtonIndex:(NSInteger)buttonIndex
 	
 	//check if we should start a new game
 	if([self gameOver]){
-		[self newGame];
+		AirHocky_AppDelegate *app =(AirHocky_AppDelegate*) [UIApplication sharedApplication].delegate;
+		[app showTitle];
 		return;
 	}
 	
@@ -437,56 +443,59 @@ didDismissWithButtonIndex:(NSInteger)buttonIndex
 	//NSLog(@"%f\n",viewPaddle1_top.frame.size.width);
 }
 
-
+-(void)computerAI{
+	switch (ai_state) {
+		case AI_BORED:{
+			if (paddle1_top.speed == 0) {
+				//move paddle into a random position within the player1 box
+				float x = gPlayerBox[0].origin.x +
+				arc4random() % (int) gPlayerBox[0].size.width;
+				float y = gPlayerBox[0].origin.y +
+				arc4random() % (int) gPlayerBox[0].size.height;
+				[paddle1_top move:CGPointMake(x, y)];
+				ai_state = AI_WAIT;
+			}
+		}break;
+		case AI_DEFENSE:{
+			//move puck to the puck x position and split the difference
+			//between the goal
+			[paddle1_top move:
+			 CGPointMake(puck.center.x,
+						 puck.center.y/2)];
+			if (puck.speed < 1) {
+				ai_state = AI_WAIT;
+			}
+		}break;
+		case AI_OFFENSE:{
+		}break;
+		default://ai_wait
+			//wait until paddle has stopped
+			if( paddle1_top.speed == 0){
+				//pick a random number between 0 and 9
+				int r = arc4random() % 10;
+				//if we pick the number 1 then we go into a new state
+				if( r == 1){
+					//if puck is heading towards us at a good rate
+					//then go into defense
+					if( puck.speed >= 1 && puck.dy <0){
+						ai_state = AI_DEFENSE;
+					}else{
+						ai_state = AI_BORED;
+					}
+				}
+			}
+			break;
+	}
+	
+	//move paddle to a random position within player1 box
+}
 
 -(void)animate{
 	
-	//move puch to new position based on direction and speed
-//	viewPuck.center = CGPointMake(viewPuck.center.x + (dx*speed), viewPuck.center.y + (dy*speed));
-	//Quick and dirty AI for top paddle
-	//viewPaddle1_top.center = CGPointMake(viewPuck.center.x, viewPaddle1_top.center.y);
-	//check puck collision with left and right walls
-	
-//	if([self checkPuckCollision:WallBarrierLeft.frame DirX:fabs(dx) DirY:0] ||
-//	   [self checkPuckCollision:WallBarrierRight.frame DirX:-fabs(dx) DirY:0] ||
-//		
-//	   [self checkPuckCollision:WallGoalBarrierTopLeft.frame DirX:0 DirY:fabs(dy)] ||
-//	   [self checkPuckCollision:WallGoalBarrierTopRight.frame DirX:0 DirY:fabs(dy)] ||
-//	   
-//	   [self checkPuckCollision:WallInnerGoalBarrierTopLeft.frame DirX:fabs(dx) DirY:0] ||
-//	   [self checkPuckCollision:WallInnerGoalBarrierTopRight.frame DirX:-fabs(dx) DirY:0] ||
-//	   
-//	   [self checkPuckCollision:WallGoalBarrierBottomLeft.frame DirX:0 DirY:-fabs(dy)] ||
-//	   [self checkPuckCollision:WallGoalBarrierBottomRight.frame DirX:0 DirY:-fabs(dy)] ||
-//	   
-//	   [self checkPuckCollision:WallInnerGoalBarrierBottomLeft.frame DirX:fabs(dx) DirY:0] ||
-//	   [self checkPuckCollision:WallInnerGoalBarrierBottomRight.frame DirX:-fabs(dx) DirY:0]
-//	   )	{
-//		[self playSound:SOUND_WALL];
-//	}
-	//check that the puck hit the non goalie wall
-	
-//	//check puck collision with player paddles
-//	if([self checkPuckCollision:viewPaddle1_top.frame
-//						   DirX:((viewPuck.center.x -viewPaddle1_top.center.x)/13.0)*((arc4random() %2)?-1:1)
-//						   DirY:1] ||
-//	   [self checkPuckCollision:viewPaddle2_bot.frame
-//						   DirX:((viewPuck.center.x -viewPaddle2_bot.center.x)/13.0)*((arc4random() %2)?-1:1)
-//						   DirY:-1])
-//		{
-//		[self playSound:SOUND_PADDLE];
-//		//count the number of puck collisions with the puck.
-//		//every ten will cause the paddles of both player to shrink.
-////		if ((numPaddleCollisions++ % 10)==9) {
-////			[self shrinkPaddle];
-////		}
-//		//[self increaseSpeed];
-//		}
-//	//check for goal
-//	if( 	[self checkGoal])
-//		{
-//		[self playSound:SOUND_SCORE];
-//		}
+	//computer ai
+	if( computer){
+		[self computerAI];
+	}
 	
 	//move paddles
 	[paddle1_top animate];
@@ -517,8 +526,13 @@ didDismissWithButtonIndex:(NSInteger)buttonIndex
 }
 -(void) viewWillDisappear:(BOOL)animated
 {
+	NSLog(@"viewWillDisappear begin");
 	[self resignFirstResponder];
-	[self viewWillDisappear:animated];
+	//This used to have infinite recursion because
+	//it accidentally used "self" instead of super
+	//problem solved
+	[super viewWillDisappear:animated];
+	NSLog(@"viewWillDisappear end");
 }
 
 -(void)motionBegan:(UIEventSubtype)motion
